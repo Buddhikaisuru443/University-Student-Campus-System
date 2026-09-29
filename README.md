@@ -7,11 +7,21 @@ This project is a Java console-based application developed for managing universi
 
 ## Team Members
 
-|       Name      | Student ID | Responsibility                                            |
-| Buddhika Isuru  | 22UG3-0238 | Team Leader, Linked List, Student Management, Integration |
-| Thisara Indunil | 22UG3-0145 | Stack and Queue                                           |
-| Pasindu Kavinda | 22UG3-0425 | BST and Hashing                                           |
-| Devindi Jayalath| 22UG3-0427 | Graph and BFS/DFS                                         |
+Member 1 - (Team Leader)
+Name: Buddhika Isuru 22UG3-0238 
+Responsibility: Linked List, Student Management, Integration
+
+Member 2 - 
+Name: Thisara Indunil 22UG3-0145 
+Responsibility: Stack and Queue       
+
+Member 3 -
+Name: Pasindu Kavinda 22UG3-0425
+Responsibility: BST and Hashing     
+
+Member 4 -
+Name: Devindi Jayalath 22UG3-0427
+Responsibility: Graph and BFS/DFS                                         
 
 ## Data Structures Used
 
