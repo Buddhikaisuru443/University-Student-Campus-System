@@ -2,36 +2,27 @@ import java.util.Scanner;
 
 public class Main {
 
-    static Scanner scanner = new Scanner(System.in);
+    private static Scanner scanner = new Scanner(System.in);
 
-    static LinkedListStudent studentList =
-            new LinkedListStudent();
-
-    static ActionStack actionStack =
-            new ActionStack();
-
-    static ServiceQueue serviceQueue =
-            new ServiceQueue();
-
-    static BST bst =
-            new BST();
-
-    static StudentHashTable hashTable =
-            new StudentHashTable();
-
-    static CampusGraph campusGraph =
-            new CampusGraph();
-
+    // Data Structures
+    private static LinkedListStudent studentList = new LinkedListStudent();
+    private static ActionStack actionStack = new ActionStack();
+    private static ServiceQueue serviceQueue = new ServiceQueue();
+    private static BST bst = new BST();
+    private static StudentHashTable hashTable = new StudentHashTable();
+    private static CampusGraph campusGraph = new CampusGraph();
 
     public static void main(String[] args) {
 
         int choice;
 
+        // First menu display
         do {
-
             displayMenu();
 
             choice = readInt("Enter your choice: ");
+
+            System.out.println();
 
             switch (choice) {
 
@@ -48,7 +39,7 @@ public class Main {
                     break;
 
                 case 4:
-                    studentList.displayAll();
+                    displayAllStudents();
                     break;
 
                 case 5:
@@ -60,15 +51,15 @@ public class Main {
                     break;
 
                 case 7:
-                    actionStack.displayActions();
+                    displayRecentActions();
                     break;
 
                 case 8:
-                    bst.displayInOrder();
+                    displayStudentsBST();
                     break;
 
                 case 9:
-                    searchUsingHashing();
+                    searchStudentUsingHashing();
                     break;
 
                 case 10:
@@ -88,7 +79,7 @@ public class Main {
                     break;
 
                 case 14:
-                    campusGraph.displayConnections();
+                    displayCampusConnections();
                     break;
 
                 case 15:
@@ -96,15 +87,20 @@ public class Main {
                     break;
 
                 case 16:
-                    System.out.println(
-                            "\nThank you for using the system."
-                    );
+                    System.out.println("============================================");
+                    System.out.println(" Thank you for using the system.");
+                    System.out.println(" System exited successfully.");
+                    System.out.println("============================================");
                     break;
 
                 default:
-                    System.out.println(
-                            "Invalid choice. Please select 1-16."
-                    );
+                    System.out.println("Invalid choice.");
+                    System.out.println("Please select a number between 1 and 16.");
+            }
+
+            // Do not show this after Exit
+            if (choice != 16) {
+                pressEnterToReturn();
             }
 
         } while (choice != 16);
@@ -113,229 +109,210 @@ public class Main {
     }
 
 
-    // ============================
-    // MENU
-    // ============================
+    // ============================================================
+    // MAIN MENU
+    // ============================================================
 
-    public static void displayMenu() {
+    private static void displayMenu() {
 
-        System.out.println("\n");
-        System.out.println(
-                "============================================"
-        );
-        System.out.println(
-                " UNIVERSITY STUDENT & CAMPUS SYSTEM"
-        );
-        System.out.println(
-                "============================================"
-        );
-
+        System.out.println();
+        System.out.println("============================================");
+        System.out.println(" UNIVERSITY STUDENT & CAMPUS SYSTEM");
+        System.out.println("============================================");
         System.out.println("1. Add Student Record");
         System.out.println("2. Update Student Record");
         System.out.println("3. Delete Student Record");
         System.out.println("4. Display All Records using Linked List");
-
         System.out.println("5. Add Service Request to Queue");
         System.out.println("6. Process Next Service Request");
         System.out.println("7. Display Recent Actions using Stack");
-
         System.out.println("8. Display Students using BST");
         System.out.println("9. Search Student using Hashing");
-
         System.out.println("10. Add Campus Location");
         System.out.println("11. Remove Campus Location");
         System.out.println("12. Add Campus Connection/Road");
         System.out.println("13. Remove Campus Connection/Road");
         System.out.println("14. Display Campus Connections");
         System.out.println("15. Traverse Campus using BFS/DFS");
-
         System.out.println("16. Exit");
-
-        System.out.println(
-                "============================================"
-        );
+        System.out.println("============================================");
     }
 
 
-    // ============================
-    // STUDENT MANAGEMENT
-    // ============================
+    // ============================================================
+    // OPTION 1 - ADD STUDENT
+    // ============================================================
 
-    public static void addStudent() {
+    private static void addStudent() {
 
-        System.out.println(
-                "\n========== ADD STUDENT =========="
-        );
+        System.out.println("========== ADD STUDENT ==========");
 
-        String id = readNonEmpty(
-                "Enter Student ID: "
-        );
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine();
 
-        if (studentList.searchStudent(id) != null) {
+        System.out.print("Enter Name: ");
+        String name = scanner.nextLine();
 
-            System.out.println(
-                    "Student ID already exists."
-            );
+        System.out.print("Enter Programme: ");
+        String programme = scanner.nextLine();
 
+        double marks = readDouble("Enter Marks (0-100): ");
+
+        if (marks < 0 || marks > 100) {
+            System.out.println("Invalid marks. Marks must be between 0 and 100.");
             return;
         }
 
-        String name = readNonEmpty(
-                "Enter Name: "
-        );
-
-        String programme = readNonEmpty(
-                "Enter Programme: "
-        );
-
-        double marks = readMarks();
-
-        Student student =
-                new Student(
-                        id,
-                        name,
-                        programme,
-                        marks
-                );
-
-        studentList.addStudent(student);
-
-        bst.insert(student);
-
-        hashTable.insert(student);
-
-        actionStack.push(
-                new Action(
-                        "Added student: " + id
-                )
-        );
-
-        System.out.println(
-                "Student added successfully."
-        );
-    }
-
-
-    public static void updateStudent() {
-
-        System.out.println(
-                "\n========== UPDATE STUDENT =========="
-        );
-
-        String id = readNonEmpty(
-                "Enter Student ID: "
-        );
-
-        Student student =
-                studentList.searchStudent(id);
-
-        if (student == null) {
-
-            System.out.println(
-                    "Student record not found."
-            );
-
-            return;
-        }
-
-        String name = readNonEmpty(
-                "Enter New Name: "
-        );
-
-        String programme = readNonEmpty(
-                "Enter New Programme: "
-        );
-
-        double marks = readMarks();
-
-        studentList.updateStudent(
-                id,
+        Student student = new Student(
+                studentId,
                 name,
                 programme,
                 marks
         );
 
-        /*
-         * BST and Hash Table store the same Student object.
-         * Therefore the updated values are automatically reflected.
-         */
+        boolean added = studentList.addStudent(student);
 
-        actionStack.push(
-                new Action(
-                        "Updated student: " + id
-                )
-        );
+        if (added) {
 
-        System.out.println(
-                "Student updated successfully."
-        );
+            // Add to BST
+            bst.insert(student);
+
+            // Add to Hash Table
+            hashTable.insert(student);
+
+            // Add action to Stack
+            actionStack.push(
+                    new Action("Added student: " + studentId)
+            );
+
+            System.out.println("Student added successfully.");
+
+        } else {
+            System.out.println("Student ID already exists.");
+        }
     }
 
 
-    public static void deleteStudent() {
+    // ============================================================
+    // OPTION 2 - UPDATE STUDENT
+    // ============================================================
 
-        System.out.println(
-                "\n========== DELETE STUDENT =========="
-        );
+    private static void updateStudent() {
 
-        String id = readNonEmpty(
-                "Enter Student ID: "
-        );
+        System.out.println("========== UPDATE STUDENT ==========");
 
-        Student deleted =
-                studentList.deleteStudent(id);
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine();
 
-        if (deleted == null) {
+        Student existingStudent =
+                studentList.searchStudent(studentId);
 
-            System.out.println(
-                    "Student record not found."
-            );
-
+        if (existingStudent == null) {
+            System.out.println("Student not found.");
             return;
         }
 
-        bst.delete(id);
+        System.out.println();
+        System.out.println("Current Student Details:");
+        existingStudent.displayStudent();
 
-        hashTable.delete(id);
+        System.out.println();
 
-        actionStack.push(
-                new Action(
-                        "Deleted student: " + id
-                )
-        );
+        System.out.print("Enter New Name: ");
+        String name = scanner.nextLine();
 
-        System.out.println(
-                "Student deleted successfully."
-        );
+        System.out.print("Enter New Programme: ");
+        String programme = scanner.nextLine();
+
+        double marks = readDouble("Enter New Marks (0-100): ");
+
+        if (marks < 0 || marks > 100) {
+            System.out.println("Invalid marks. Marks must be between 0 and 100.");
+            return;
+        }
+
+        boolean updated =
+                studentList.updateStudent(
+                        studentId,
+                        name,
+                        programme,
+                        marks
+                );
+
+        if (updated) {
+
+            // Update hash table
+            hashTable.insert(existingStudent);
+
+            // Action stack
+            actionStack.push(
+                    new Action("Updated student: " + studentId)
+            );
+
+            System.out.println("Student updated successfully.");
+
+        } else {
+            System.out.println("Student update failed.");
+        }
     }
 
 
-    // ============================
-    // QUEUE
-    // ============================
+    // ============================================================
+    // OPTION 3 - DELETE STUDENT
+    // ============================================================
 
-    public static void addServiceRequest() {
+    private static void deleteStudent() {
 
-        System.out.println(
-                "\n========== ADD SERVICE REQUEST =========="
-        );
+        System.out.println("========== DELETE STUDENT ==========");
 
-        String studentId = readNonEmpty(
-                "Enter Student ID: "
-        );
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine();
 
-        if (studentList.searchStudent(studentId) == null) {
+        Student deletedStudent =
+                studentList.deleteStudent(studentId);
 
-            System.out.println(
-                    "Student record not found."
+        if (deletedStudent != null) {
+
+            bst.delete(studentId);
+            hashTable.delete(studentId);
+
+            actionStack.push(
+                    new Action("Deleted student: " + studentId)
             );
 
-            return;
-        }
+            System.out.println("Student deleted successfully.");
 
-        String requestType = readNonEmpty(
-                "Enter Request Type: "
-        );
+        } else {
+            System.out.println("Student not found.");
+        }
+    }
+
+
+    // ============================================================
+    // OPTION 4 - DISPLAY LINKED LIST
+    // ============================================================
+
+    private static void displayAllStudents() {
+
+        System.out.println("========== DISPLAY ALL STUDENTS ==========");
+
+        studentList.displayAll();
+    }
+
+
+    // ============================================================
+    // OPTION 5 - ADD SERVICE REQUEST
+    // ============================================================
+
+    private static void addServiceRequest() {
+
+        System.out.println("========== ADD SERVICE REQUEST ==========");
+
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine();
+
+        System.out.print("Enter Request Type: ");
+        String requestType = scanner.nextLine();
 
         ServiceRequest request =
                 new ServiceRequest(
@@ -347,95 +324,105 @@ public class Main {
 
         actionStack.push(
                 new Action(
-                        "Added service request for "
+                        "Added service request for: "
                         + studentId
                 )
         );
 
-        System.out.println(
-                "Service request added to queue."
-        );
+        System.out.println("Service request added to queue successfully.");
     }
 
 
-    public static void processServiceRequest() {
+    // ============================================================
+    // OPTION 6 - PROCESS SERVICE REQUEST
+    // ============================================================
 
-        System.out.println(
-                "\n========== PROCESS REQUEST =========="
-        );
+    private static void processServiceRequest() {
+
+        System.out.println("========== PROCESS SERVICE REQUEST ==========");
 
         ServiceRequest request =
                 serviceQueue.dequeue();
 
         if (request == null) {
-
-            System.out.println(
-                    "No pending service requests."
-            );
-
+            System.out.println("No pending service requests.");
             return;
         }
 
-        System.out.println(
-                "Processing: " + request
-        );
+        System.out.println("Processing request:");
+        System.out.println(request);
 
         actionStack.push(
                 new Action(
-                        "Processed service request for "
+                        "Processed service request for: "
                         + request.getStudentId()
                 )
         );
+
+        System.out.println("Service request processed successfully.");
     }
 
 
-    // ============================
-    // HASHING
-    // ============================
+    // ============================================================
+    // OPTION 7 - DISPLAY RECENT ACTIONS
+    // ============================================================
 
-    public static void searchUsingHashing() {
+    private static void displayRecentActions() {
 
-        System.out.println(
-                "\n========== HASH SEARCH =========="
-        );
+        System.out.println("========== DISPLAY RECENT ACTIONS ==========");
 
-        String id = readNonEmpty(
-                "Enter Student ID: "
-        );
+        actionStack.displayActions();
+    }
+
+
+    // ============================================================
+    // OPTION 8 - DISPLAY BST
+    // ============================================================
+
+    private static void displayStudentsBST() {
+
+        System.out.println("========== DISPLAY STUDENTS USING BST ==========");
+
+        bst.displayInOrder();
+    }
+
+
+    // ============================================================
+    // OPTION 9 - SEARCH USING HASHING
+    // ============================================================
+
+    private static void searchStudentUsingHashing() {
+
+        System.out.println("========== SEARCH STUDENT USING HASHING ==========");
+
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine();
 
         Student student =
-                hashTable.search(id);
+                hashTable.search(studentId);
 
-        if (student == null) {
+        if (student != null) {
 
-            System.out.println(
-                    "Student not found."
-            );
+            System.out.println();
+            System.out.println("Student found:");
+            student.displayStudent();
 
-            return;
+        } else {
+            System.out.println("Student not found.");
         }
-
-        System.out.println(
-                "\nStudent found using Hashing:"
-        );
-
-        student.displayStudent();
     }
 
 
-    // ============================
-    // GRAPH
-    // ============================
+    // ============================================================
+    // OPTION 10 - ADD CAMPUS LOCATION
+    // ============================================================
 
-    public static void addCampusLocation() {
+    private static void addCampusLocation() {
 
-        System.out.println(
-                "\n========== ADD CAMPUS LOCATION =========="
-        );
+        System.out.println("========== ADD CAMPUS LOCATION ==========");
 
-        String location = readNonEmpty(
-                "Enter location name: "
-        );
+        System.out.print("Enter Location Name: ");
+        String location = scanner.nextLine();
 
         boolean added =
                 campusGraph.addLocation(location);
@@ -449,28 +436,24 @@ public class Main {
                     )
             );
 
-            System.out.println(
-                    "Campus location added successfully."
-            );
+            System.out.println("Campus location added successfully.");
 
         } else {
-
-            System.out.println(
-                    "Campus location already exists."
-            );
+            System.out.println("Campus location already exists.");
         }
     }
 
 
-    public static void removeCampusLocation() {
+    // ============================================================
+    // OPTION 11 - REMOVE CAMPUS LOCATION
+    // ============================================================
 
-        System.out.println(
-                "\n========== REMOVE CAMPUS LOCATION =========="
-        );
+    private static void removeCampusLocation() {
 
-        String location = readNonEmpty(
-                "Enter location name: "
-        );
+        System.out.println("========== REMOVE CAMPUS LOCATION ==========");
+
+        System.out.print("Enter Location Name: ");
+        String location = scanner.nextLine();
 
         boolean removed =
                 campusGraph.removeLocation(location);
@@ -484,32 +467,27 @@ public class Main {
                     )
             );
 
-            System.out.println(
-                    "Campus location removed successfully."
-            );
+            System.out.println("Campus location removed successfully.");
 
         } else {
-
-            System.out.println(
-                    "Campus location not found."
-            );
+            System.out.println("Campus location not found.");
         }
     }
 
 
-    public static void addCampusConnection() {
+    // ============================================================
+    // OPTION 12 - ADD CAMPUS CONNECTION
+    // ============================================================
 
-        System.out.println(
-                "\n========== ADD CAMPUS CONNECTION =========="
-        );
+    private static void addCampusConnection() {
 
-        String location1 = readNonEmpty(
-                "Enter first location: "
-        );
+        System.out.println("========== ADD CAMPUS CONNECTION / ROAD ==========");
 
-        String location2 = readNonEmpty(
-                "Enter second location: "
-        );
+        System.out.print("Enter First Location: ");
+        String location1 = scanner.nextLine();
+
+        System.out.print("Enter Second Location: ");
+        String location2 = scanner.nextLine();
 
         boolean added =
                 campusGraph.addConnection(
@@ -521,39 +499,39 @@ public class Main {
 
             actionStack.push(
                     new Action(
-                            "Added connection: "
+                            "Added road: "
                             + location1
                             + " - "
                             + location2
                     )
             );
 
-            System.out.println(
-                    "Campus connection added successfully."
-            );
+            System.out.println("Campus connection added successfully.");
 
         } else {
-
             System.out.println(
                     "Unable to add connection."
+            );
+            System.out.println(
+                    "Make sure both locations exist and the connection is not duplicated."
             );
         }
     }
 
 
-    public static void removeCampusConnection() {
+    // ============================================================
+    // OPTION 13 - REMOVE CAMPUS CONNECTION
+    // ============================================================
 
-        System.out.println(
-                "\n========== REMOVE CAMPUS CONNECTION =========="
-        );
+    private static void removeCampusConnection() {
 
-        String location1 = readNonEmpty(
-                "Enter first location: "
-        );
+        System.out.println("========== REMOVE CAMPUS CONNECTION / ROAD ==========");
 
-        String location2 = readNonEmpty(
-                "Enter second location: "
-        );
+        System.out.print("Enter First Location: ");
+        String location1 = scanner.nextLine();
+
+        System.out.print("Enter Second Location: ");
+        String location2 = scanner.nextLine();
 
         boolean removed =
                 campusGraph.removeConnection(
@@ -565,76 +543,92 @@ public class Main {
 
             actionStack.push(
                     new Action(
-                            "Removed connection: "
+                            "Removed road: "
                             + location1
                             + " - "
                             + location2
                     )
             );
 
-            System.out.println(
-                    "Campus connection removed successfully."
-            );
+            System.out.println("Campus connection removed successfully.");
+
+        } else {
+            System.out.println("Campus connection not found.");
+        }
+    }
+
+
+    // ============================================================
+    // OPTION 14 - DISPLAY CAMPUS CONNECTIONS
+    // ============================================================
+
+    private static void displayCampusConnections() {
+
+        System.out.println("========== DISPLAY CAMPUS CONNECTIONS ==========");
+
+        campusGraph.displayConnections();
+    }
+
+
+    // ============================================================
+    // OPTION 15 - BFS / DFS
+    // ============================================================
+
+    private static void traverseCampus() {
+
+        System.out.println("========== CAMPUS TRAVERSAL ==========");
+
+        System.out.print("Enter Starting Location: ");
+        String startLocation = scanner.nextLine();
+
+        System.out.println();
+
+        System.out.println("1. BFS");
+        System.out.println("2. DFS");
+
+        int traversalChoice =
+                readInt("Enter traversal choice: ");
+
+        System.out.println();
+
+        if (traversalChoice == 1) {
+
+            campusGraph.bfs(startLocation);
+
+        } else if (traversalChoice == 2) {
+
+            campusGraph.dfs(startLocation);
 
         } else {
 
-            System.out.println(
-                    "Connection not found."
-            );
+            System.out.println("Invalid traversal choice.");
         }
     }
 
 
-    public static void traverseCampus() {
+    // ============================================================
+    // PRESS ENTER
+    // ============================================================
 
-        System.out.println(
-                "\n========== CAMPUS TRAVERSAL =========="
-        );
+    private static void pressEnterToReturn() {
 
-        String start = readNonEmpty(
-                "Enter starting location: "
-        );
-
-        System.out.println("\nBFS:");
-        campusGraph.bfs(start);
-
-        System.out.println("\nDFS:");
-        campusGraph.dfs(start);
+        System.out.println();
+        System.out.println("Press ENTER to return to the menu...");
+        scanner.nextLine();
     }
 
 
-    // ============================
-    // INPUT VALIDATION
-    // ============================
+    // ============================================================
+    // READ INTEGER
+    // ============================================================
 
-    public static String readNonEmpty(String message) {
+    private static int readInt(String message) {
 
         while (true) {
 
             System.out.print(message);
 
-            String input =
-                    scanner.nextLine().trim();
-
-            if (!input.isEmpty()) {
-                return input;
-            }
-
-            System.out.println(
-                    "Input cannot be empty."
-            );
-        }
-    }
-
-
-    public static int readInt(String message) {
-
-        while (true) {
-
-            System.out.print(message);
-
-            String input =
-                    scanner.nextLine().trim();
+            String input = scanner.nextLine();
 
             try {
 
@@ -650,34 +644,26 @@ public class Main {
     }
 
 
-    public static double readMarks() {
+    // ============================================================
+    // READ DOUBLE
+    // ============================================================
+
+    private static double readDouble(String message) {
 
         while (true) {
 
-            System.out.print(
-                    "Enter Marks (0-100): "
-            );
+            System.out.print(message);
 
-            String input =
-                    scanner.nextLine().trim();
+            String input = scanner.nextLine();
 
             try {
 
-                double marks =
-                        Double.parseDouble(input);
-
-                if (marks >= 0 && marks <= 100) {
-                    return marks;
-                }
-
-                System.out.println(
-                        "Marks must be between 0 and 100."
-                );
+                return Double.parseDouble(input);
 
             } catch (NumberFormatException e) {
 
                 System.out.println(
-                        "Invalid marks. Please enter a number."
+                        "Invalid input. Please enter a valid number."
                 );
             }
         }
